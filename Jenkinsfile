@@ -16,16 +16,16 @@ pipeline {
             }
         }
 
-        stage('Setup Environment') {
-            steps {
-                echo 'Installing Python dependencies for pipeline checks...'
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install -r requirements.txt
-                '''
-            }
-        }
+        // stage('Setup Environment') {
+        //     steps {
+        //         echo 'Installing Python dependencies for pipeline checks...'
+        //         sh '''
+        //             python3 -m venv venv
+        //             . venv/bin/activate
+        //             pip install -r requirements.txt
+        //         '''
+        //     }
+        // }
 
         stage('Drift Detection & Auto-Retraining') {
             steps {
