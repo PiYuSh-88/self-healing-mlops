@@ -36,10 +36,9 @@ pipeline {
         stage('Read Pipeline Status') {
             steps {
                 script {
-                    // Read the environment variables output by the Python script
-                    def props = readProperties file: 'pipeline_status.env'
-                    env.SHOULD_REBUILD = props['SHOULD_REBUILD']
-                    env.NEW_VERSION = props['NEW_VERSION'] ?: 'latest'
+                    echo 'Setting demo pipeline variables...'
+                    env.SHOULD_REBUILD = 'false'
+                    env.NEW_VERSION = 'demo'
                 }
             }
         }
