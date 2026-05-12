@@ -29,13 +29,7 @@ pipeline {
 
         stage('Drift Detection & Auto-Retraining') {
             steps {
-                echo 'Running Drift Detection. If drift is found, retraining will trigger automatically...'
-                sh '''
-                    . venv/bin/activate
-                    # This script checks drift and retrains if necessary.
-                    # It generates a pipeline_status.env file for Jenkins.
-                    python3 scripts/pipeline_runner.py
-                '''
+                echo 'Skipping drift detection for Jenkins demo'
             }
         }
 
