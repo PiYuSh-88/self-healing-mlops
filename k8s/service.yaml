@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: churn-api-service
+spec:
+  # 1. Type: LoadBalancer exposes the service externally using a cloud provider's
+  # load balancer. On Docker Desktop/Minikube, it acts locally to open a port.
+  # (Alternatively, 'NodePort' exposes the service on a static port on each Node).
+  type: LoadBalancer
+  
+  # 2. Selector: Routes traffic to any pod that has the label 'app: churn-api'
+  selector:
+    app: churn-api
+    
+  # 3. Ports Configuration:
+  ports:
+    - protocol: TCP
+      # The port this Service is exposed on (what the user hits)
+      port: 80
+      # The target port on the actual Pods (where FastAPI is listening)
+      targetPort: 8000

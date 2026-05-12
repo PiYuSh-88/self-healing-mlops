@@ -1,0 +1,39 @@
+# ── Python ──────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual Environments ───
+venv/
+.venv/
+env/
+
+# ── IDE / Editor ───────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS Files ───────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs (generated at runtime) ──
+logs/prediction_log.csv
+
+# ── Model artifacts (large binary files) ──
+# Uncomment below if you do NOT want to track models in Git:
+# models/*.pkl
+
+# ── Environment / Secrets ──
+.env
+*.env
+!pipeline_status.env
+
+# ── Docker ─────────────────
+pipeline_status.env

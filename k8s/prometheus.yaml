@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+
+    rule_files:
+      - "/etc/prometheus/mlops_rules.yml"
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets: ['alertmanager-service:9093']
+
+    scrape_configs:
+      - job_name: 'fastapi-mlops'
+        # Prometheus will look for the /metrics endpoint here
+        metrics_path: '/metrics'
+        static_configs:
+          # In K8s, services can talk to each other via their Service names
+          - targets: ['churn-api-service:80']
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/prometheus/prometheus.yml
+              subPath: prometheus.yml
+            - name: rules-volume
+              mountPath: /etc/prometheus/mlops_rules.yml
+              subPath: mlops_rules.yml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: prometheus-config
+        - name: rules-volume
+          configMap:
+            name: prometheus-rules
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+spec:
+  type: NodePort # Makes Prometheus accessible on a static local port (or via port-forward)
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090

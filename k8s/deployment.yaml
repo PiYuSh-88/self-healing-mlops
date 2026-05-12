@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churn-api-deployment
+  labels:
+    app: churn-api
+spec:
+  # 1. Replicas: Run 2 identical pods for high availability and load balancing
+  replicas: 2
+  
+  # 2. Selector: Tells the deployment which pods to manage based on labels
+  selector:
+    matchLabels:
+      app: churn-api
+      
+  # 3. Template: The blueprint for creating the pods
+  template:
+    metadata:
+      labels:
+        app: churn-api
+    spec:
+      containers:
+      - name: api
+        # Container Image: Use the Docker image built locally or from a registry
+        # Use 'mlops-app:latest' for Minikube/Docker Desktop
+        image: mlops-app:latest
+
+        
+        # imagePullPolicy: IfNotPresent means use the local image if available,
+        # otherwise try to pull from the internet. Essential for local testing!
+        imagePullPolicy: Never
+        
+        # 4. Ports: Expose the port the FastAPI app listens on inside the container
+        ports:
+        - containerPort: 8000
+          name: http
+          
+        # 5. Environment Variables: Pass config down to the app
+        env:
+        - name: DRIFT_THRESHOLD
+          value: "0.5"
+          
+        # (Future) Liveness and Readiness Probes would go here to tell K8s
+        # exactly when the API is ready to accept traffic.
+        # livenessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8000

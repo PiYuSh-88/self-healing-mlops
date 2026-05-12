@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mlops-drift-detector
+  labels:
+    app: drift-detector
+spec:
+  # Schedule: Run every day at midnight. 
+  # (For testing, you could use "*/5 * * * *" to run every 5 minutes)
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: drift-checker
+            # Using a lightweight curl image to trigger the Jenkins webhook
+            image: curlimages/curl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Triggering Jenkins MLOps Pipeline..."
+              # In a real environment, this hits the Jenkins Generic Webhook Trigger.
+              # Jenkins will then run the pipeline (pull code -> check drift -> retrain -> rebuild -> redeploy)
+              # Replace with your actual Jenkins webhook URL:
+              curl -X POST http://jenkins-server:8080/generic-webhook-trigger/invoke?token=mlops-secret-token
+          restartPolicy: OnFailure

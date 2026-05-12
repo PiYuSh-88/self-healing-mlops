@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+data:
+  mlops_rules.yml: |-
+    groups:
+    - name: mlops_alerts
+      rules:
+      # 1. High API Latency Alert
+      - alert: HighApiLatency
+        # If the 95th percentile latency over 5 minutes is greater than 1 second
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1.0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API Latency on FastAPI"
+          description: "The 95th percentile latency is > 1s for the last 2 minutes."
+
+      # 2. High Error Rate Alert
+      - alert: HighErrorRate
+        # If more than 5% of requests return a 5xx error over 5 minutes
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Error Rate on FastAPI"
+          description: "More than 5% of requests are failing with 5xx errors."

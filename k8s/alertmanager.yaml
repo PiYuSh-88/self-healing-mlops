@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+data:
+  alertmanager.yml: |-
+    global:
+      # Replace with your actual SMTP or Slack settings
+      slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+
+    route:
+      receiver: 'slack-notifications'
+      # Group alerts together to avoid spam
+      group_by: ['alertname']
+      group_wait: 10s
+      group_interval: 5m
+      repeat_interval: 1h
+
+    receivers:
+    - name: 'slack-notifications'
+      slack_configs:
+      - channel: '#mlops-alerts'
+        send_resolved: true
+        title: '[{{ .Status | toUpper }}] {{ .GroupLabels.alertname }}'
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }}
+            *Description:* {{ .Annotations.description }}
+          {{ end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+        - name: alertmanager
+          image: prom/alertmanager:latest
+          ports:
+            - containerPort: 9093
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/alertmanager/alertmanager.yml
+              subPath: alertmanager.yml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: alertmanager-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager-service
+spec:
+  type: ClusterIP
+  selector:
+    app: alertmanager
+  ports:
+    - port: 9093
+      targetPort: 9093
