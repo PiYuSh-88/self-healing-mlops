@@ -13,6 +13,5 @@ notebooks/
 k8s/
 Jenkinsfile
 DevOps_Project_Synopsis.pdf
-jenkins_walkthrough.md
-kubernetes_guide.md
-monitoring_guide.md
+terraform/
+frontend/

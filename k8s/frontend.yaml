@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlops-frontend-deployment
+  labels:
+    app: mlops-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlops-frontend
+  template:
+    metadata:
+      labels:
+        app: mlops-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: mlops-frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlops-frontend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: mlops-frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 80

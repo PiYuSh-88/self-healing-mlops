@@ -14,6 +14,7 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import API_TITLE, API_DESCRIPTION, API_VERSION
 from app.schemas import CustomerData, PredictionResponse, HealthResponse, DriftResponse, RetrainResponse
@@ -59,6 +60,15 @@ app = FastAPI(
 # ── Prometheus Instrumentation ──────────────────────────────────────
 # Exposes the /metrics endpoint to track requests, latency, and errors
 Instrumentator().instrument(app).expose(app)
+
+# ── CORS — allow the React frontend to call this API ────────────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # ━━━━━━━━━━━━━━━━━━━━━ ROUTES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -32,8 +32,15 @@ logs/prediction_log.csv
 
 # ── Environment / Secrets ──
 .env
-*.env
-!pipeline_status.env
-
-# ── Docker ─────────────────
 pipeline_status.env
+
+# ── Terraform ──────────────
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars
+
+# ── Frontend ───────────────
+frontend/node_modules/
+frontend/dist/
